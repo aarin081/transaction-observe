@@ -2,10 +2,6 @@ name: Deploy Arc observation registry
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths:
-      - .github/deploy-trigger
 
 permissions:
   contents: read
@@ -47,15 +43,7 @@ jobs:
         run: |
           if [ -f deployment.json ]; then
             echo "## Arc Testnet deployment" >> "$GITHUB_STEP_SUMMARY"
-            node - <<'NODE' >> "$GITHUB_STEP_SUMMARY"
-            const fs = require('fs');
-            const d = JSON.parse(fs.readFileSync('deployment.json', 'utf8'));
-            console.log(`- Contract: [${d.contractAddress}](${d.explorerContractUrl})`);
-            console.log(`- Deployment tx: [${d.deploymentTxHash}](${d.explorerDeploymentTxUrl})`);
-            console.log(`- Observation tx: [${d.observationTxHash}](${d.explorerObservationTxUrl})`);
-            console.log(`- Observed block: ${d.observedBlock}`);
-            console.log(`- Deployer: ${d.deployer}`);
-            NODE
+            node -e 'const fs=require("fs"); const d=JSON.parse(fs.readFileSync("deployment.json","utf8")); console.log(`- Contract: [${d.contractAddress}](${d.explorerContractUrl})\n- Deployment tx: [${d.deploymentTxHash}](${d.explorerDeploymentTxUrl})\n- Observation tx: [${d.observationTxHash}](${d.explorerObservationTxUrl})\n- Observed block: ${d.observedBlock}\n- Deployer: ${d.deployer}`)' >> "$GITHUB_STEP_SUMMARY"
           fi
 
       - name: Upload deployment evidence
