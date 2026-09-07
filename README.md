@@ -1,5 +1,7 @@
 # Arc Transaction Observer
 
+[![Arc observer CI](https://github.com/aarin081/transaction-observe/actions/workflows/ci.yml/badge.svg)](https://github.com/aarin081/transaction-observe/actions/workflows/ci.yml)
+
 A developer tool for inspecting **Arc Testnet** transaction infrastructure in real time.
 
 It checks the Arc RPC, validates the chain ID, reports the latest block and gas conditions, verifies Arc's USDC ERC-20 interface, and tracks confirmed transaction receipts. It also makes Arc's USDC accounting model explicit: **native USDC uses 18-decimal EVM units for gas/value math, while the ERC-20 interface uses 6 decimals for token balances and transfers**.
@@ -50,6 +52,20 @@ npm run receipt -- 0x<transaction-hash>
 ### Tests and CI
 
 `npm test` verifies the unit-conversion and fee-floor logic locally. GitHub Actions runs typechecking, all unit tests, and a live Arc Testnet RPC check on pushes and pull requests.
+
+## Verified live run
+
+The first CI run on this repository completed successfully on 2026-09-07. It:
+
+- passed TypeScript typechecking
+- passed all 5 unit tests
+- connected to `https://rpc.testnet.arc.network`
+- verified chain ID `5042002`
+- queried live block `60958821`
+- observed a 25 gwei gas price
+- verified the Arc USDC system contract reports 6 ERC-20 decimals
+
+CI evidence: https://github.com/aarin081/transaction-observe/actions/runs/34156914316
 
 ## Quick start
 
