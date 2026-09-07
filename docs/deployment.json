@@ -1,0 +1,17 @@
+{
+  "network": "Arc Testnet",
+  "chainId": 5042002,
+  "deployer": "0x0F888Cc75C1a2131cE54e926C751b8a4a2b851Ce",
+  "contractName": "ArcObservationRegistry",
+  "contractAddress": "0xB5Cb71b80Bd37b6e7F6B0a86bce21A105B1e1466",
+  "deploymentTxHash": "0x110ead4ce0ddaef168c3a0d77cf75cbab839df52e7080632ed99dce731c301c8",
+  "observationTxHash": "0x13a54c7625dc40f8fbb70f1ec5b45c482ae16f2376fef5cb25fdec96e6295d26",
+  "observedBlock": 60971174,
+  "observedBlockHash": "0x0ef4208e008072ab5a009c5d0d29acf1f2eef9a1e30c70602ec930664c5c223e",
+  "observedGasPriceWei": "25000000000",
+  "sourceVerified": true,
+  "explorerContractUrl": "https://testnet.arcscan.app/address/0xB5Cb71b80Bd37b6e7F6B0a86bce21A105B1e1466",
+  "explorerDeploymentTxUrl": "https://testnet.arcscan.app/tx/0x110ead4ce0ddaef168c3a0d77cf75cbab839df52e7080632ed99dce731c301c8",
+  "explorerObservationTxUrl": "https://testnet.arcscan.app/tx/0x13a54c7625dc40f8fbb70f1ec5b45c482ae16f2376fef5cb25fdec96e6295d26",
+  "deployedAt": "2026-09-07T21:33:14.218Z"
+}
