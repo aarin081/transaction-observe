@@ -9,4 +9,6 @@ wallet.json
 coverage/
 dist/
 *.log
+deployment.json
+standard-input.json
 .DS_Store
