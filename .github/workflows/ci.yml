@@ -25,8 +25,11 @@ jobs:
       - name: Typecheck
         run: npm run build
 
-      - name: Unit tests
+      - name: Unit and contract tests
         run: npm test
 
       - name: Live Arc Testnet check
         run: npm run health
+
+      - name: Verify deployed Arc evidence
+        run: npm run evidence
