@@ -9,7 +9,12 @@ import {
 } from "ethers";
 
 const RPC_URL = process.env.ARC_RPC_URL ?? "https://rpc.testnet.arc.io";
-const PRIVATE_KEY = process.env.ARC_PRIVATE_KEY;
+const RAW_PRIVATE_KEY = process.env.ARC_PRIVATE_KEY?.trim();
+const PRIVATE_KEY = RAW_PRIVATE_KEY
+  ? RAW_PRIVATE_KEY.startsWith("0x")
+    ? RAW_PRIVATE_KEY
+    : `0x${RAW_PRIVATE_KEY}`
+  : undefined;
 const EXPECTED_CHAIN_ID = 5_042_002n;
 const SOURCE_PATH = "contracts/ArcObservationRegistry.sol";
 const CONTRACT_NAME = "ArcObservationRegistry";
