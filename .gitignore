@@ -1,0 +1,12 @@
+node_modules/
+.env
+.env.*
+!.env.example
+wallet.json
+*.keypair.json
+*.pem
+*.key
+coverage/
+dist/
+*.log
+.DS_Store
