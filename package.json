@@ -1,6 +1,6 @@
 {
   "name": "arc-transaction-observer",
-  "version": "0.2.1",
+  "version": "0.2.2",
   "private": true,
   "description": "Arc Testnet RPC, gas, USDC accounting, receipt tracking and onchain observation tooling",
   "license": "MIT",
@@ -15,8 +15,8 @@
     "verify:registry": "node scripts/verify.mjs"
   },
   "dependencies": {
-    "ethers": "6.15.0",
-    "solc": "0.8.30"
+    "ethers": "6.17.0",
+    "solc": "0.8.36"
   },
   "devDependencies": {
     "@types/node": "^26.0.1",
