@@ -1,14 +1,16 @@
 {
   "name": "arc-transaction-observer",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "private": true,
   "description": "Arc Testnet RPC, gas, USDC accounting, receipt tracking and onchain observation tooling",
+  "license": "MIT",
   "type": "module",
   "scripts": {
     "health": "tsx src/health.ts",
     "receipt": "tsx src/receipt.ts",
     "build": "tsc --noEmit",
     "test": "node --import tsx --test test/*.test.ts",
+    "evidence": "node scripts/check-deployment.mjs",
     "deploy:registry": "node scripts/deploy.mjs",
     "verify:registry": "node scripts/verify.mjs"
   },
