@@ -2,15 +2,27 @@
 
 [![Arc observer CI](https://github.com/aarin081/transaction-observe/actions/workflows/ci.yml/badge.svg)](https://github.com/aarin081/transaction-observe/actions/workflows/ci.yml)
 
-A developer tool for inspecting **Arc Testnet** transaction infrastructure in real time.
+A small developer-infrastructure project for inspecting **Arc Testnet** transaction behavior and validating Arc-specific assumptions with executable checks.
 
-It checks the Arc RPC, validates the chain ID, reports the latest block and gas conditions, verifies Arc's USDC ERC-20 interface, and tracks confirmed transaction receipts. It also makes Arc's USDC accounting model explicit: **native USDC uses 18-decimal EVM units for gas/value math, while the ERC-20 interface uses 6 decimals for token balances and transfers**.
+It checks Arc RPC health, validates the chain ID, reports current block and gas conditions, verifies Arc's USDC ERC-20 interface, tracks transaction receipts, and verifies a deployed onchain observation registry. It also makes Arc's USDC accounting model explicit: **native USDC uses 18-decimal EVM units for gas/value math, while the ERC-20 interface uses 6 decimals for token balances and transfers**.
 
-The core observer is read-only. An optional deployment workflow uses a GitHub Actions secret to deploy and verify a small observation registry on Arc Testnet.
+The core observer is read-only. A separate manual-only GitHub Actions workflow can deploy and verify the observation registry using a repository secret; no private key is committed to the repository.
 
-## Why this exists
+## What this demonstrates
 
-Arc is EVM-compatible, but its USDC-native design introduces details that infrastructure and application developers need to handle correctly:
+This repository is intentionally focused on developer observability rather than a consumer-facing dApp. It demonstrates:
+
+- direct JSON-RPC interaction with Arc Testnet
+- Arc chain-ID and live-network validation
+- native-USDC and ERC-20 decimal handling
+- gas observation and conservative fee calculation
+- transaction receipt and fee inspection
+- Solidity compilation and interface tests
+- an onchain registry deployment and state-changing observation transaction
+- ArcScan source verification
+- CI checks against both live Arc RPC data and the deployed contract
+
+## Arc assumptions checked by the project
 
 - Arc Testnet chain ID: `5042002`
 - Primary RPC: `https://rpc.testnet.arc.io`
@@ -19,7 +31,7 @@ Arc is EVM-compatible, but its USDC-native design introduces details that infras
 - The USDC ERC-20 interface uses 6 decimals
 - Arc Testnet enforces a 20 gwei minimum base fee
 
-The goal is to turn those assumptions into executable checks instead of leaving them as documentation-only knowledge.
+The goal is to turn these assumptions into executable checks instead of leaving them as documentation-only knowledge.
 
 ## Features
 
@@ -49,13 +61,25 @@ Given an Arc Testnet transaction hash, the tracker polls for its receipt and rep
 npm run receipt -- 0x<transaction-hash>
 ```
 
+### Onchain deployment evidence check
+
+`npm run evidence` re-checks public deployment evidence directly against Arc Testnet. It verifies that:
+
+- contract bytecode exists at the recorded address
+- the deployment transaction succeeded
+- the observation transaction succeeded
+- the registry owner matches the recorded deployer
+- the registry's latest observation matches the recorded Arc block, block hash and gas price
+
+Public deployment facts are stored in `docs/deployment.json`. No secret material is stored there.
+
 ### Tests and CI
 
-`npm test` verifies the unit-conversion and fee-floor logic locally. GitHub Actions runs typechecking, all unit tests, and a live Arc Testnet RPC check on pushes and pull requests.
+`npm test` covers the Arc native/USDC unit model, fee-floor logic, Solidity compilation and the registry interface. GitHub Actions runs typechecking, the test suite, a live Arc Testnet health check, and the public deployment-evidence check on pushes and pull requests.
 
 ## Verified Arc Testnet deployment
 
-`ArcObservationRegistry` was deployed and verified on Arc Testnet on 2026-09-07. The deployment workflow also recorded a live network observation onchain after deployment.
+`ArcObservationRegistry` was deployed on Arc Testnet on 2026-09-07 and its source was verified on ArcScan. The deployment workflow then submitted a second transaction that recorded a live Arc network observation onchain.
 
 - Contract: `0xB5Cb71b80Bd37b6e7F6B0a86bce21A105B1e1466`
 - ArcScan contract: https://testnet.arcscan.app/address/0xB5Cb71b80Bd37b6e7F6B0a86bce21A105B1e1466
@@ -63,23 +87,21 @@ npm run receipt -- 0x<transaction-hash>
 - Observation transaction: https://testnet.arcscan.app/tx/0x13a54c7625dc40f8fbb70f1ec5b45c482ae16f2376fef5cb25fdec96e6295d26
 - Observed block: `60971174`
 - ArcScan source verification: **passed**
-- Deployment workflow evidence: https://github.com/aarin081/transaction-observe/actions/runs/34163526310
+- Continuous verification: https://github.com/aarin081/transaction-observe/actions/workflows/ci.yml
 
-The deployment and observation transaction steps both succeeded, and ArcScan returned `Pass - Verified` for the contract source.
+## Project layout
 
-## Verified live RPC run
-
-The first CI run on this repository completed successfully on 2026-09-07. It:
-
-- passed TypeScript typechecking
-- passed all 5 unit tests
-- connected to `https://rpc.testnet.arc.io`
-- verified chain ID `5042002`
-- queried a live Arc block
-- observed live gas pricing
-- verified the Arc USDC system contract reports 6 ERC-20 decimals
-
-CI evidence: https://github.com/aarin081/transaction-observe/actions/runs/34156914316
+```text
+contracts/ArcObservationRegistry.sol  onchain observation registry
+src/health.ts                         live Arc RPC and USDC checks
+src/receipt.ts                        transaction receipt inspection
+scripts/deploy.mjs                    guarded Arc Testnet deployment
+scripts/verify.mjs                    ArcScan source verification
+scripts/check-deployment.mjs          public onchain evidence re-check
+docs/deployment.json                  public deployment facts
+test/                                 unit and contract compilation tests
+.github/workflows/                     CI and manual deployment automation
+```
 
 ## Quick start
 
@@ -88,6 +110,7 @@ npm install
 npm run build
 npm test
 npm run health
+npm run evidence
 ```
 
 Optional custom RPC:
@@ -104,10 +127,15 @@ ARC_RPC_URL=https://rpc.testnet.arc.io npm run health
 
 ## Security
 
-No wallet file, seed phrase, or private key is committed to this repository. `.env` files and common key-file patterns are ignored by Git. The optional deployment workflow reads `ARC_PRIVATE_KEY` only from GitHub Actions repository secrets.
+No wallet file, seed phrase, or private key is committed to this repository. `.env` files and common key-file patterns are ignored by Git. The deployment script checks the Arc Testnet chain ID before signing. Deployment is manual-only and reads `ARC_PRIVATE_KEY` from GitHub Actions repository secrets.
 
 ## Roadmap
 
-- add a block-stream/latency sampler
-- add fixture-based receipt tests
-- expand receipt and event decoding around the deployed registry
+- add block-stream and latency sampling over longer windows
+- decode registry events in the receipt tooling
+- add fixture-based receipt and revert-path tests
+- expand the observer into reusable Arc transaction diagnostics
+
+## License
+
+MIT
